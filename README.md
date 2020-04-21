@@ -1,8 +1,7 @@
-# `selectore`
+# `mortadella`
 
-* ~~grocery-store~~
-* ~~carpaccio~~
-* ~~restoreant~~
+## alternative names
+
 * mortadella
 * flower-store
 * hook-store
@@ -13,7 +12,7 @@
 
 A **`570 bytes`** hook based **immutable store**, with **actions** and **selector based subscriptions**<br>
 
-**Selectore** leverages `useState` and `Immer` to create independent rendering trees, so that your components only re-render when their dependencies change.
+**mortadella** leverages `useState` and `Immer` to create independent rendering trees, so that your components only re-render when their dependencies change.
 
 ## Demos
 
@@ -29,29 +28,50 @@ CodeSandbox demos
 `select` the part of your global state that your component needs and **only re-render when the selected state changes**.
 
 ```tsx
-import { createStore } from 'selectore'
+import React from "react";
+import ReactDOM from "react-dom";
+import { createStore } from "./mortadella";
 
 // create a store and pass an initial state
+
 const { getState, createAction, useStoreSelector } = createStore({
-  names: ['kilian', 'hassan', 'juliet'],
-  places: ['san francisco', 'salò', 'lebanon']
-})
+  names: ["kilian", "hassan", "juliet"],
+  places: ["san francisco", "salò", "lebanon"]
+});
 
-// calling `addName` will trigger a re-render
+// a Immer Draft<S> is passed to the action creator
+
 const addName = createAction((state, name: string) => {
-  state.names.push(name)
-})
+  state.names.push(name);
+});
 
-// calling `addPlace` will not trigger a re-render
 const addPlace = createAction((state, name: string) => {
-  state.places.push(name)
-})
+  state.places.push(name);
+});
+
+// this component only re-renders when `state.names` changes
 
 const Names = () => {
-  // this component will only re-render when `state.names` changes
-  const names = useStoreSelector((state) => state.names)
-  return names.map((name, key) => <span key={key}>{name}</span>)
-}
+  const names = useStoreSelector(state => state.names);
+  console.info("<Names /> re-render");
+
+  return (
+    <div>
+      <button onClick={() => addName("prison mike")}>Add "Prison Mike"</button>
+      <button onClick={() => addPlace("scranton")}>Add "Scranton"</button>
+      <h2>Names:</h2>
+      <ul>
+        {names.map((name, key) => (
+          <li key={key}>{name}</li>
+        ))}
+      </ul>
+      <h2>State:</h2>
+      <pre>{JSON.stringify(getState(), null, 2)}</pre>
+    </div>
+  );
+};
+
+ReactDOM.render(<Names />, document.getElementById("root"));
 ```
 
 ## How it works
