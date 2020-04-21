@@ -1,31 +1,28 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "jsx": "react",
     "lib": [
-      "es2017",
-      "dom"
+      "dom",
+      "ESNext"
     ],
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "noEmit": true,
-    "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es5",
-    "types": ["jest"]
+    "target": "ESNext"
   },
   "include": [
-    "src/**/*", "examples/react-app-env.d.ts", "examples/index.tsx", "examples"
+    "src"
   ],
   "exclude": [
     ".git",
-    "node_modules"
+    "node_modules",
+    "src/**/*.js",
+    "src/**/*.test.*",
   ]
 }

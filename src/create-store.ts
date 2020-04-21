@@ -22,7 +22,7 @@ export const createStore = <S>(initialState: S) => {
     })
   }
 
-  const useStoreSelector = <R>(selector: (state: S) => R) => {
+  const useStoreSubscription = <R>(selector: (state: S) => R) => {
     const memoizedSelector = useCallback(selector, [])
     const stateSelectorResult = memoizedSelector(currentState)
     const [oldState, setState] = useSafeSetState(stateSelectorResult)
@@ -54,7 +54,8 @@ export const createStore = <S>(initialState: S) => {
 
   return {
     getState,
-    useStoreSelector,
+    useStoreSelector: useStoreSubscription,
+    useStoreSubscription,
     createAction
   }
 }

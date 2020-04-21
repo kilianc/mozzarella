@@ -1,7 +1,23 @@
 # `selectore`
 
-A **`60LOC`** hook based **immutable store**, with **actions** and **selectors**<br>
+* ~~grocery-store~~
+* ~~carpaccio~~
+* ~~restoreant~~
+* mortadella
+* flower-store
+* hook-store
+* store-hook
+* pa-store
+* superstore
+
+
+A **`60LOC`** hook based **immutable store**, with **actions** and **selector based subscriptions**<br>
+
 **Selectore** leverages `useState` and `Immer` to create independent rendering trees, so that your components only re-render when their dependencies change.
+
+## Demos
+
+CodeSandbox demos
 
 ## Install
 

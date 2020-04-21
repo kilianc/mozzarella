@@ -16,12 +16,12 @@ test('should correctly create a store', () => {
   })
 
   expect(store.getState).toBeDefined()
-  expect(store.useStoreSelector).toBeDefined()
+  expect(store.useStoreSubscription).toBeDefined()
   expect(store.createAction).toBeDefined()
 })
 
 test('should re-render components only when the selected state changes', async () => {
-  const { getState, createAction, useStoreSelector } = createStore({
+  const { getState, createAction, useStoreSubscription } = createStore({
     names: ['kilian', 'hassan', 'juliet'],
     places: ['san francisco', 'salò', 'lebanon']
   })
@@ -37,7 +37,7 @@ test('should re-render components only when the selected state changes', async (
   let count = 0
   const { result } = renderHook(() => {
     count++
-    return useStoreSelector((state) => state.names)
+    return useStoreSubscription((state) => state.names)
   })
 
   expect(count).toBe(1)
