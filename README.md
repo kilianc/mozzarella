@@ -1,4 +1,4 @@
-# selectore
+# `selectore`
 
 A **`60LOC`** hook based **immutable store**, with **actions** and **selectors**<br>
 **Selectore** leverages `useState` and `Immer` to create independent rendering trees, so that your components only re-render when their dependencies change.
