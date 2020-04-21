@@ -40,9 +40,9 @@ const Names = () => {
 
 ## How it works
 
-This library allows you to use a subscribe through selectors approach to connect your components to the store.
+This library allows you to use a *"subscribe through selectors"* approach, to connect your components to the store.
 
-The implementation is very simple, it's [60LOC]() and all it does is running all the selectors used by your components and determine when to call `setState` to trigger a re-render.
+The implementation is very simple ([60LOC](src/create-store.ts)) and all it does is run all the selectors used by your components and determine when to call `setState` to trigger a re-render.
 
 ## Example with pure functional components
 
@@ -140,7 +140,7 @@ Takes the initial state as parameter and returns an object with three properties
 ### `getState`
 
 ```ts
-const getState = () => S
+const getState = () => S;
 ```
 
 Returns the instance of your immutable state
@@ -148,7 +148,7 @@ Returns the instance of your immutable state
 ### `createAction`
 
 ```ts
-const createAction = <U extends unknown[]>(actionFn: (state: Draft<S>, ...params: U) => void): (...params: U) => void
+const createAction = <U extends unknown[]>(actionFn: (state: Draft<S>, ...params: U) => void): (...params: U) => void;
 ```
 
 Takes a **pure function** as input and returns a *closured* **action** function that can manipulate a `Draft<S>` of your state. All changes will be committed on the next tick and all the selectors run to determine what needs to be re-rendered.
@@ -158,7 +158,41 @@ Takes a **pure function** as input and returns a *closured* **action** function 
 ### `useStoreSelector`
 
 ```ts
-const useStoreSelector: <R>(selector: (state: S) => R) => R
+const useStoreSelector: <R>(selector: (state: S) => R) => R;
 ```
 
-Hook that give a selector function, will return the output of the selector and re-render the component only when it changes.
+Hook that given a selector function, will return the output of the selector and re-render the component only when it changes.
+
+## How to contribute
+
+Contributions and bug fixes from the community are welcome. You can run the test suite locally with:
+
+    $ yarn lint
+    $ yarn test
+
+## License
+
+This software is released under the MIT license cited below.
+
+  Copyright (c) 2020 Kilian Ciuffolo, me@nailik.org. All Rights Reserved.
+
+  Permission is hereby granted, free of charge, to any person
+  obtaining a copy of this software and associated documentation
+  files (the 'Software'), to deal in the Software without
+  restriction, including without limitation the rights to use,
+  copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the
+  Software is furnished to do so, subject to the following
+  conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  OTHER DEALINGS IN THE SOFTWARE.
