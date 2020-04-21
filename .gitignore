@@ -1,1 +1,6 @@
-src/index.html
+.DS_Store
+.env
+.idea
+*.log*
+/lib/
+node_modules

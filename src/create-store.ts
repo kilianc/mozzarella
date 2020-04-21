@@ -1,6 +1,5 @@
-import { useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Draft, createDraft, finishDraft } from 'immer'
-import { useSafeSetState } from './safe-set-state'
 import isEqual from 'react-fast-compare'
 
 export const createStore = <S>(initialState: S) => {
@@ -25,7 +24,7 @@ export const createStore = <S>(initialState: S) => {
   const useStoreSubscription = <R>(selector: (state: S) => R) => {
     const memoizedSelector = useCallback(selector, [])
     const stateSelectorResult = memoizedSelector(currentState)
-    const [oldState, setState] = useSafeSetState(stateSelectorResult)
+    const [oldState, setState] = useState(stateSelectorResult)
     selectors.set(memoizedSelector, [oldState, setState])
 
     return stateSelectorResult
