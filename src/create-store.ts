@@ -1,12 +1,13 @@
 import { useCallback } from 'react'
 import { Draft, createDraft, finishDraft } from 'immer'
 import { useSafeSetState } from './safe-set-state'
+import isEqual from 'react-fast-compare'
 
 export const createStore = <S>(initialState: S) => {
   const selectors = new Map()
 
   let currentState = initialState
-  let finishDraftTimeout: number | null = null
+  let finishDraftTimeout: ReturnType<typeof setTimeout> | null = null
   let draftState: Draft<S> | null = null
 
   const getState = () => {
@@ -14,16 +15,18 @@ export const createStore = <S>(initialState: S) => {
   }
 
   const runSelectors = () => {
-    selectors.forEach((set, selector) => {
-      set(selector(currentState))
+    selectors.forEach(([oldState, set], selector) => {
+      const newState = selector(currentState)
+      if (isEqual(newState, oldState)) return
+      set(newState)
     })
   }
 
   const useStoreSelector = <R>(selector: (state: S) => R) => {
     const memoizedSelector = useCallback(selector, [])
     const stateSelectorResult = memoizedSelector(currentState)
-    const [, setState] = useSafeSetState(stateSelectorResult)
-    selectors.set(memoizedSelector, setState)
+    const [oldState, setState] = useSafeSetState(stateSelectorResult)
+    selectors.set(memoizedSelector, [oldState, setState])
 
     return stateSelectorResult
   }
@@ -44,7 +47,7 @@ export const createStore = <S>(initialState: S) => {
           currentState = finishDraft(draftState) as S
           draftState = null
           runSelectors()
-        })
+        }, 100)
       }
 
       return result
