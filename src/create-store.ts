@@ -31,15 +31,15 @@ export const createStore = <S>(initialState: S) => {
     return stateSelectorResult
   }
 
-  function createAction<A, U extends unknown[]>(
-    actionFn: (state: Draft<S>, ...params: U) => A
+  function createAction<U extends unknown[]>(
+    actionFn: (state: Draft<S>, ...params: U) => void
   ) {
     return (...params: U) => {
       if (draftState === null) {
         draftState = createDraft(currentState)
       }
 
-      const result = actionFn(draftState, ...params)
+      actionFn(draftState, ...params)
 
       if (!finishDraftTimeout) {
         finishDraftTimeout = setTimeout(() => {
@@ -49,8 +49,6 @@ export const createStore = <S>(initialState: S) => {
           runSelectors()
         }, 100)
       }
-
-      return result
     }
   }
 

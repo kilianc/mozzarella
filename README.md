@@ -1,26 +1,48 @@
-# react-selectable-store
+# selectore
+
+A **`60LOC`** hook based **immutable store**, with **actions** and **selectors**<br>
+**Selectore** leverages `useState` and `Immer` to create independent rendering trees, so that your components only re-render when their dependencies change.
+
+## Install
+
+    $ yarn add --dev --exact selector
+
+## Usage
+
+
+`select` the part of your global state that your component needs and **only re-render when the selected state changes**.
 
 ```tsx
-import { createStore } from 'react-create-store'
+import { createStore } from 'selectore'
 
+// create a store and pass an initial state
 const { getState, createAction, useStoreSelector } = createStore({
   names: ['kilian', 'hassan', 'juliet'],
   places: ['san francisco', 'salò', 'lebanon']
 })
 
+// calling `addName` will trigger a re-render
 const addName = createAction((state, name: string) => {
   state.names.push(name)
 })
 
+// calling `addPlace` will not trigger a re-render
 const addPlace = createAction((state, name: string) => {
   state.places.push(name)
 })
 
-const MyComponent = () => {
+const Names = () => {
+  // this component will only re-render when `state.names` changes
   const names = useStoreSelector((state) => state.names)
   return names.map((name, key) => <span key={key}>{name}</span>)
 }
 ```
+
+## How it works
+
+This library allows you to use a subscribe through selectors approach to connect your components to the store.
+
+The implementation is very simple, it's [60LOC]() and all it does is running all the selectors used by your components and determine when to call `setState` to trigger a re-render.
 
 ## Example with pure functional components
 
@@ -96,3 +118,47 @@ export const App = () => (
 
 ReactDOM.render(<App />, document.getElementById('app'))
 ```
+
+## API Reference
+
+### `createStore`
+
+```ts
+createStore <S>(initialState: S) => {
+  getState: () => S;
+  useStoreSelector: <R>(selector: (state: S) => R) => R;
+  createAction: <U extends unknown[]>(actionFn: (state: Draft<S>, ...params: U) => void) => (...params: U) => void;
+}
+```
+
+Takes the initial state as parameter and returns an object with three properties:
+
+* [`getState`](#getState)
+* [`createAction`](#createAction)
+* [`useStoreSelector`](#useStoreSelector)
+
+### `getState`
+
+```ts
+const getState = () => S
+```
+
+Returns the instance of your immutable state
+
+### `createAction`
+
+```ts
+const createAction = <U extends unknown[]>(actionFn: (state: Draft<S>, ...params: U) => void): (...params: U) => void
+```
+
+Takes a **pure function** as input and returns a *closured* **action** function that can manipulate a `Draft<S>` of your state. All changes will be committed on the next tick and all the selectors run to determine what needs to be re-rendered.
+
+> ⚠️ This function cannot be asynchronous and should not have side effects.
+
+### `useStoreSelector`
+
+```ts
+const useStoreSelector: <R>(selector: (state: S) => R) => R
+```
+
+Hook that give a selector function, will return the output of the selector and re-render the component only when it changes.
