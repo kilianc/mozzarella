@@ -1,0 +1,35 @@
+{
+  "name": "use-store",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "main": "src/index.tsx",
+  "devDependencies": {
+    "@testing-library/react": "10.0.1",
+    "@types/react": "16.9.25",
+    "@types/react-dom": "16.9.5",
+    "@typescript-eslint/eslint-plugin": "2.25.0",
+    "@typescript-eslint/parser": "2.25.0",
+    "eslint": "6.8.0",
+    "eslint-config-prettier": "6.10.1",
+    "eslint-plugin-prettier": "3.1.2",
+    "eslint-plugin-react": "7.19.0",
+    "eslint-plugin-react-hooks": "2.5.1",
+    "immer": "6.0.2",
+    "prettier": "1.19.1",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-scripts": "3.4.1",
+    "reselect": "4.0.0",
+    "typescript": "3.8.3"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit --skipLibCheck && eslint 'src/**/*.{js,ts,tsx}' --max-warnings=0"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

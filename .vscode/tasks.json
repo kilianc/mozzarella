@@ -1,0 +1,67 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "run:service-webapp",
+      "presentation": {
+        "reveal": "always"
+      },
+      "command": "/bin/zsh",
+      "isBackground": true,
+      "args": [
+        "-cli",
+        "${workspaceFolder}/../../bin/run.sh . --reload"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": false,
+          "beginsPattern": "^Debugger listening.+$",
+          "endsPattern": "^For help.+$"
+        }
+      }
+    },
+    {
+      "type": "shell",
+      "label": "test:service-webapp",
+      "presentation": {
+        "reveal": "always"
+      },
+      "command": "/bin/zsh",
+      "isBackground": true,
+      "args": [
+        "-cli",
+        "${workspaceFolder}/../../bin/run.sh . --reload --test"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": false,
+          "beginsPattern": "^Debugger listening.+$",
+          "endsPattern": "^For help.+$"
+        }
+      }
+    }
+  ]
+}

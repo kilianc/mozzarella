@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach: service-webapp",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/opt/app",
+      "protocol": "inspector",
+      "timeout": 60000,
+      "restart": true
+    }
+  ]
+}
