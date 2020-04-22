@@ -11,8 +11,9 @@ afterEach(() => {
 
 test('should correctly create a store', () => {
   const store = createStore({
-    names: ['kilian', 'hassan', 'juliet'],
-    places: ['san francisco', 'salò', 'lebanon']
+    pizza: 'ya',
+    pasta: 'yas',
+    mozzarella: 'yas!'
   })
 
   expect(store.getState).toBeDefined()
@@ -22,52 +23,52 @@ test('should correctly create a store', () => {
 
 test('should re-render components only when the selected state changes', async () => {
   const { getState, createAction, useStoreSubscription } = createStore({
-    names: ['kilian', 'hassan', 'juliet'],
-    places: ['san francisco', 'salò', 'lebanon']
+    colors: ['green', 'white', 'red'],
+    cities: ['brescia', 'roma', 'firenze']
   })
 
-  const addName = createAction((state, name: string) => {
-    state.names.push(name)
+  const addColor = createAction((state, color: string) => {
+    state.colors.push(color)
   })
 
-  const addPlace = createAction((state, name: string) => {
-    state.places.push(name)
+  const addCity = createAction((state, city: string) => {
+    state.cities.push(city)
   })
 
   let count = 0
   const { result } = renderHook(() => {
     count++
-    return useStoreSubscription((state) => state.names)
+    return useStoreSubscription((state) => state.colors)
   })
 
   expect(count).toBe(1)
-  expect(result.current).toEqual(['kilian', 'hassan', 'juliet'])
+  expect(result.current).toEqual(['green', 'white', 'red'])
   expect(getState()).toEqual({
-    names: ['kilian', 'hassan', 'juliet'],
-    places: ['san francisco', 'salò', 'lebanon']
+    colors: ['green', 'white', 'red'],
+    cities: ['brescia', 'roma', 'firenze']
   })
 
   act(() => {
-    addName('foo')
+    addColor('blue')
     jest.runAllTimers()
   })
 
   expect(count).toBe(2)
-  expect(result.current).toEqual(['kilian', 'hassan', 'juliet', 'foo'])
+  expect(result.current).toEqual(['green', 'white', 'red', 'blue'])
   expect(getState()).toEqual({
-    names: ['kilian', 'hassan', 'juliet', 'foo'],
-    places: ['san francisco', 'salò', 'lebanon']
+    colors: ['green', 'white', 'red', 'blue'],
+    cities: ['brescia', 'roma', 'firenze']
   })
 
   act(() => {
-    addPlace('foo')
+    addCity('venezia')
     jest.runAllTimers()
   })
 
   expect(count).toBe(2)
-  expect(result.current).toEqual(['kilian', 'hassan', 'juliet', 'foo'])
+  expect(result.current).toEqual(['green', 'white', 'red', 'blue'])
   expect(getState()).toEqual({
-    names: ['kilian', 'hassan', 'juliet', 'foo'],
-    places: ['san francisco', 'salò', 'lebanon', 'foo']
+    colors: ['green', 'white', 'red', 'blue'],
+    cities: ['brescia', 'roma', 'firenze', 'venezia']
   })
 })

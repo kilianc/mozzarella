@@ -24,8 +24,6 @@
   ],
   "exclude": [
     ".git",
-    "node_modules",
-    "src/**/*.js",
-    "src/**/*.test.*"
+    "node_modules"
   ]
 }
