@@ -52,8 +52,8 @@ const addPlace = createAction((state, name: string) => {
 // this component only re-renders when `state.names` changes
 
 const Names = () => {
-  const names = useStoreSelector(state => state.names);
   console.info("<Names /> re-render");
+  const names = useStoreSelector(state => state.names);
 
   return (
     <div>
