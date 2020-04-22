@@ -22,5 +22,6 @@ jobs:
           yarn --frozen-lockfile
           yarn lint
           yarn test
+          yarn build
         env:
           CI: "true"
