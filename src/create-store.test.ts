@@ -138,10 +138,19 @@ test('should work with async actions', async () => {
   ])
 })
 
-test('should re-run selectors when the dependencies change', async () => {
-  const { subscriptionsCount, useStoreSubscription } = createStore({
-    value: 0
-  })
+test('should correctly handle when the hook deps change', async () => {
+  const OriginalMap = window.Map
+  class MapMock extends OriginalMap {
+    static instances: Array<unknown> = []
+    constructor() {
+      super()
+      MapMock.instances.push(this)
+    }
+  }
+
+  window.Map = MapMock
+  const { useStoreSubscription } = createStore({ value: 0 })
+  window.Map = OriginalMap
 
   let count = 0
   renderHook(() => {
@@ -163,5 +172,7 @@ test('should re-run selectors when the dependencies change', async () => {
   })
 
   expect(count).toBe(4)
-  expect(subscriptionsCount()).toBe(1)
+  expect(MapMock.instances.length).toBe(1)
+
+  window.Map = OriginalMap
 })

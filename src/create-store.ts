@@ -94,7 +94,6 @@ export const createStore = <S>(initialState: S) => {
     getState,
     useStoreSubscription,
     useDerivedState: useStoreSubscription,
-    createAction,
-    subscriptionsCount: () => selectors.size
+    createAction
   }
 }
