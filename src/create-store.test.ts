@@ -87,26 +87,36 @@ test('should batch draft commits once per tick', async () => {
 })
 
 test('should work with async actions', async () => {
-  const { createAction, useStoreSubscription } = createStore({
+  type State = {
+    books: Array<{
+      title: string
+      rating?: number
+    }>
+  }
+  const { createAction, useStoreSubscription } = createStore<State>({
     books: [
       {
         title: 'children of time',
-        rating: 4.5
+        rating: 3
       }
     ]
   })
 
   const addBook = createAction(async (state) => {
     state.books.push({
-      title: 'children of some books',
-      rating: -1
+      title: 'children of ruin'
     })
 
-    const rating = await new Promise<number>((resolve) =>
-      setTimeout(() => resolve(5), 100)
+    const rating1 = await new Promise<number>((resolve) =>
+      setTimeout(() => resolve(4.5), 100)
     )
 
-    state.books[1].rating = rating
+    const rating2 = await new Promise<number>((resolve) =>
+      setTimeout(() => resolve(4), 100)
+    )
+
+    state.books[0].rating = rating1
+    state.books[1].rating = rating2
   })
 
   const { result } = renderHook(() =>
@@ -121,8 +131,8 @@ test('should work with async actions', async () => {
       rating: 4.5
     },
     {
-      title: 'children of some books',
-      rating: 5
+      title: 'children of ruin',
+      rating: 4
     }
   ])
 })

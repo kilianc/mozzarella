@@ -10,7 +10,7 @@
 * superstore
 
 
-A **`570 bytes`** hook based **immutable store**, with **actions** and **selector based subscriptions**<br>
+A **`679 bytes`** hook based **immutable store**, with **actions** and **selector based subscriptions**<br>
 
 **mortadella** leverages `useState` and `Immer` to create independent rendering trees, so that your components only re-render when their dependencies change.
 
