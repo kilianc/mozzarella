@@ -189,8 +189,6 @@ const createAction = <U extends unknown[]>(actionFn: (state: Draft<S>, ...params
 
 Takes a **pure function** as input and returns a *closured* **action** function that can manipulate a `Draft<S>` of your state. All changes will be committed on the next tick and all the selectors run to determine what needs to be re-rendered.
 
-> ⚠️ This function cannot be asynchronous and should not have side effects.
-
 ### `useStoreSelector`
 
 ```ts

@@ -6,8 +6,29 @@ export const createStore = <S>(initialState: S) => {
   const selectors = new Map()
 
   let currentState = initialState
-  let finishDraftTimeout: ReturnType<typeof setTimeout> | null = null
-  let draftState: Draft<S> | null = null
+  let shouldFinishDraft = true
+  let draftState = createDraft(currentState)
+
+  const draftStateProxy = new Proxy(
+    {},
+    {
+      get(_, key) {
+        return Reflect.get(draftState as object, key)
+      },
+      set(_, key, value) {
+        return Reflect.set(draftState as object, key, value)
+      },
+      getOwnPropertyDescriptor(_, key) {
+        return Reflect.getOwnPropertyDescriptor(draftState as object, key)
+      },
+      deleteProperty(_, key) {
+        return Reflect.deleteProperty(draftState as object, key)
+      },
+      has(_, key) {
+        return Reflect.has(draftState as object, key)
+      }
+    }
+  )
 
   const getState = () => {
     return currentState
@@ -30,30 +51,29 @@ export const createStore = <S>(initialState: S) => {
     return stateSelectorResult
   }
 
+  const finishDraftFn = () => {
+    currentState = finishDraft(draftState)
+    draftState = createDraft(currentState)
+    runSelectors()
+    shouldFinishDraft = true
+  }
+
   function createAction<U extends unknown[]>(
     actionFn: (state: Draft<S>, ...params: U) => void
   ) {
     return (...params: U) => {
-      if (draftState === null) {
-        draftState = createDraft(currentState)
-      }
+      const result = Promise.resolve(
+        actionFn(draftStateProxy as Draft<S>, ...params)
+      ).then(shouldFinishDraft ? finishDraftFn : null)
 
-      actionFn(draftState, ...params)
+      shouldFinishDraft = false
 
-      if (!finishDraftTimeout) {
-        finishDraftTimeout = setTimeout(() => {
-          finishDraftTimeout = null
-          currentState = finishDraft(draftState) as S
-          draftState = null
-          runSelectors()
-        }, 100)
-      }
+      return result
     }
   }
 
   return {
     getState,
-    useStoreSelector: useStoreSubscription,
     useStoreSubscription,
     createAction
   }

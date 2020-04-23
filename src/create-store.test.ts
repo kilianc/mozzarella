@@ -1,14 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks'
 import { createStore } from './create-store'
 
-beforeEach(() => {
-  jest.useFakeTimers()
-})
-
-afterEach(() => {
-  jest.runAllTimers()
-})
-
 test('should correctly create a store', () => {
   const store = createStore({
     pizza: 'ya',
@@ -48,10 +40,7 @@ test('should re-render components only when the selected state changes', async (
     cities: ['brescia', 'roma', 'firenze']
   })
 
-  act(() => {
-    addColor('blue')
-    jest.runAllTimers()
-  })
+  await act(() => addColor('blue'))
 
   expect(count).toBe(2)
   expect(result.current).toEqual(['green', 'white', 'red', 'blue'])
@@ -60,10 +49,7 @@ test('should re-render components only when the selected state changes', async (
     cities: ['brescia', 'roma', 'firenze']
   })
 
-  act(() => {
-    addCity('venezia')
-    jest.runAllTimers()
-  })
+  await act(() => addCity('venezia'))
 
   expect(count).toBe(2)
   expect(result.current).toEqual(['green', 'white', 'red', 'blue'])
@@ -71,4 +57,72 @@ test('should re-render components only when the selected state changes', async (
     colors: ['green', 'white', 'red', 'blue'],
     cities: ['brescia', 'roma', 'firenze', 'venezia']
   })
+})
+
+test('should batch draft commits once per tick', async () => {
+  const { createAction, useStoreSubscription } = createStore({
+    answer: 0
+  })
+
+  const findAnswer = createAction(async (state) => {
+    state.answer++
+  })
+
+  let count = 0
+  const { result } = renderHook(() => {
+    return useStoreSubscription((state) => {
+      count++
+      return state.answer
+    })
+  })
+
+  await act(async () => {
+    for (let i = 0; i < 5; i++) {
+      findAnswer()
+    }
+  })
+
+  expect(count).toBe(3)
+  expect(result.current).toBe(5)
+})
+
+test('should work with async actions', async () => {
+  const { createAction, useStoreSubscription } = createStore({
+    books: [
+      {
+        title: 'children of time',
+        rating: 4.5
+      }
+    ]
+  })
+
+  const addBook = createAction(async (state) => {
+    state.books.push({
+      title: 'children of some books',
+      rating: -1
+    })
+
+    const rating = await new Promise<number>((resolve) =>
+      setTimeout(() => resolve(5), 100)
+    )
+
+    state.books[1].rating = rating
+  })
+
+  const { result } = renderHook(() =>
+    useStoreSubscription((state) => state.books)
+  )
+
+  await act(() => addBook())
+
+  expect(result.current).toEqual([
+    {
+      title: 'children of time',
+      rating: 4.5
+    },
+    {
+      title: 'children of some books',
+      rating: 5
+    }
+  ])
 })
