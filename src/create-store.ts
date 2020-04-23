@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, DependencyList, useRef, useEffect } from 'react'
 import { Draft, createDraft, finishDraft } from 'immer'
 import isEqual from 'react-fast-compare'
 
@@ -42,13 +42,31 @@ export const createStore = <S>(initialState: S) => {
     })
   }
 
-  const useStoreSubscription = <R>(selector: (state: S) => R) => {
-    const memoizedSelector = useCallback(selector, [])
-    const stateSelectorResult = memoizedSelector(currentState)
-    const [oldState, setState] = useState(stateSelectorResult)
-    selectors.set(memoizedSelector, [oldState, setState])
+  const useStoreSubscription = <R>(
+    selector: (state: S) => R,
+    dependencies: DependencyList = []
+  ) => {
+    const memoizedSelector = useCallback(selector, dependencies)
+    const memoizedSelectorRef = useRef(memoizedSelector)
 
-    return stateSelectorResult
+    const [derivedState, setDerivedState] = useState(
+      memoizedSelector(currentState)
+    )
+
+    if (memoizedSelectorRef.current !== memoizedSelector) {
+      selectors.delete(memoizedSelectorRef.current)
+      memoizedSelectorRef.current = memoizedSelector
+    }
+
+    selectors.set(memoizedSelector, [derivedState, setDerivedState])
+
+    useEffect(() => {
+      return () => {
+        selectors.delete(memoizedSelectorRef.current)
+      }
+    }, [])
+
+    return derivedState
   }
 
   const finishDraftFn = () => {
@@ -75,6 +93,8 @@ export const createStore = <S>(initialState: S) => {
   return {
     getState,
     useStoreSubscription,
-    createAction
+    useDerivedState: useStoreSubscription,
+    createAction,
+    subscriptionsCount: () => selectors.size
   }
 }

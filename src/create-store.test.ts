@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { renderHook, act } from '@testing-library/react-hooks'
 import { createStore } from './create-store'
 
@@ -135,4 +136,32 @@ test('should work with async actions', async () => {
       rating: 4
     }
   ])
+})
+
+test('should re-run selectors when the dependencies change', async () => {
+  const { subscriptionsCount, useStoreSubscription } = createStore({
+    value: 0
+  })
+
+  let count = 0
+  renderHook(() => {
+    const [foo, setFoo] = useState(0)
+    const [baseValue, setBaseValue] = useState(0)
+
+    useStoreSubscription(
+      (state) => {
+        count++
+        return state.value + baseValue
+      },
+      [baseValue]
+    )
+
+    if (foo === 0) setFoo(10)
+    if (baseValue === 0) setBaseValue(1)
+    if (baseValue === 1) setBaseValue(2)
+    if (baseValue === 2) setBaseValue(3)
+  })
+
+  expect(count).toBe(4)
+  expect(subscriptionsCount()).toBe(1)
 })
