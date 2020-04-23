@@ -173,6 +173,4 @@ test('should correctly handle when the hook deps change', async () => {
 
   expect(count).toBe(4)
   expect(MapMock.instances.length).toBe(1)
-
-  window.Map = OriginalMap
 })

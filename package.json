@@ -10,6 +10,8 @@
     "url": "git@github.com:kilianc/mortadella.git"
   },
   "sideEffects": "false",
+  "main": "lib/cjs/create-store.js",
+  "module": "lib/esm/create-store.js",
   "devDependencies": {
     "@testing-library/react": "10.0.3",
     "@testing-library/react-hooks": "3.2.1",

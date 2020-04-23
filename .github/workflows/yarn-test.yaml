@@ -17,11 +17,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: "https://registry.npmjs.org"
+      - name: install
+        run: yarn --frozen-lockfile
+      - name: lint
+        run: yarn lint
       - name: test
-        run: |
-          yarn --frozen-lockfile
-          yarn lint
-          yarn test
-          yarn build
-        env:
-          CI: "true"
+        run: yarn test
+      - name: build
+        run: yarn build
