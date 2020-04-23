@@ -6,8 +6,8 @@ export const createStore = <S>(initialState: S) => {
   const selectors = new Map()
 
   let currentState = initialState
-  let shouldFinishDraft = true
   let draftState = createDraft(currentState)
+  let shouldFinishDraft = true
 
   const draftStateProxy = new Proxy(
     {},
