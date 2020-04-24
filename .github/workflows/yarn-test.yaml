@@ -1,9 +1,9 @@
-name: yarn test
+name: ci
 
 on: [push]
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
 
     strategy:
