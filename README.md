@@ -14,23 +14,23 @@
 
 ## Motivation
 
-I have been struggling to find a <b>state management</b> solution for `react`, that embraces <b>plain JavaScript</b> without forcing me to adopt an opinionated pattern, requires a lot of boilerplate code, well typed and that would make sense when looking at it two weeks later.
+I have been struggling to find a **state management** solution for `react`, that embraces **plain JavaScript** without forcing me to adopt an opinionated pattern, requires a lot of boilerplate code, well typed and that would make sense when looking at it two weeks later.
 
-### The main design goals for `mozzarella` where:
+### Design Goals 🎯
 
-* Be as simple as a mozzarella (duh!)
-* Use immutability without getting in the way
-* Use plain JS functions as actions
-* Use async or sync functions for actions
-* Prevent unnecessary re-rendering of components
-* Batch changes together to prevent race conditions
-* `TypeScript` support
+* ✅ Be as simple as a **mozzarella** (duh!)
+* ✅ Use immutability without getting in the way
+* ✅ Use plain JS functions as actions
+* ✅ Use async or sync functions for actions
+* ✅ Prevent unnecessary re-rendering of components
+* ✅ Batch changes together to prevent race conditions
+* ✅ `TypeScript` support
 
 ## Install
 
     $ yarn add --dev --exact mozzarella
 
-## Demos
+## Demos 👩‍💻
 
 CodeSandbox demos
 
