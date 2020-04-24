@@ -4,7 +4,7 @@
     <code>mozzarella</code>
   </h1>
   <p>
-    A cheezy-simple <b><code>679 bytes</code></b> hook based <b><code>immutable store</code></b>, that leverages <code>useState</code> and <code>Immer</code> to create independent rendering trees, so that your components only re-render when they should.
+    A cheezy-simple <b><code>679 bytes</code></b> hook based <b><code>immutable store</code></b>, that leverages <b><code>useState</code></b> and <b><code>Immer</code></b> to create independent rendering trees, so that your components <b>only re-render when they should<b/>.
   </p>
   <br>
   <br>
