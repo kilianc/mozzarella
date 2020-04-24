@@ -1,18 +1,15 @@
-# `mortadella`
+<div align="center">
+  <img src="./.github/mozzarella.png">
+  <h1>
+    <code>mozzarella</code>
+  </h1>
+  <p>
+    <b>A <code>679 bytes</code> hook based <code>immutable store</code>, with <code>actions</code> and <code>subscriptions</code></b>
+  </p>
+</div>
 
-## alternative names
 
-* mortadella
-* flower-store
-* hook-store
-* store-hook
-* pa-store
-* superstore
-
-
-A **`679 bytes`** hook based **immutable store**, with **actions** and **selector based subscriptions**<br>
-
-**mortadella** leverages `useState` and `Immer` to create independent rendering trees, so that your components only re-render when their dependencies change.
+**mozzarella** leverages `useState` and `Immer` to create independent rendering trees, so that your components only re-render when their dependencies change.
 
 ## Demos
 
@@ -30,7 +27,7 @@ CodeSandbox demos
 ```tsx
 import React from "react";
 import ReactDOM from "react-dom";
-import { createStore } from "./mortadella";
+import { createStore } from "./mozzarella";
 
 // create a store and pass an initial state
 

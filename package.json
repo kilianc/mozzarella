@@ -1,17 +1,27 @@
 {
-  "name": "mortadella",
+  "name": "mozzarella",
   "version": "1.0.0",
   "description": "",
-  "keywords": [],
+  "keywords": [
+    "hooks",
+    "immer",
+    "react-hooks",
+    "react",
+    "state",
+    "state-management",
+    "store",
+    "typescript"
+  ],
   "author": "Kilian Ciuffolo <kilian.ciuffolo@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:kilianc/mortadella.git"
+    "url": "git@github.com:kilianc/mozzarella.git"
   },
   "sideEffects": "false",
   "main": "lib/cjs/create-store.js",
   "module": "lib/esm/create-store.js",
+  "types": "lib/esm/create-store.d.ts",
   "devDependencies": {
     "@testing-library/react": "10.0.3",
     "@testing-library/react-hooks": "3.2.1",
