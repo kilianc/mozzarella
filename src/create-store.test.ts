@@ -10,12 +10,12 @@ test('should correctly create a store', () => {
   })
 
   expect(store.getState).toBeDefined()
-  expect(store.useStoreSubscription).toBeDefined()
+  expect(store.useDerivedState).toBeDefined()
   expect(store.createAction).toBeDefined()
 })
 
 test('should re-render components only when the selected state changes', async () => {
-  const { getState, createAction, useStoreSubscription } = createStore({
+  const { getState, createAction, useDerivedState } = createStore({
     colors: ['green', 'white', 'red'],
     cities: ['brescia', 'roma', 'firenze']
   })
@@ -31,7 +31,7 @@ test('should re-render components only when the selected state changes', async (
   let count = 0
   const { result } = renderHook(() => {
     count++
-    return useStoreSubscription((state) => state.colors)
+    return useDerivedState((state) => state.colors)
   })
 
   expect(count).toBe(1)
@@ -61,7 +61,7 @@ test('should re-render components only when the selected state changes', async (
 })
 
 test('should batch draft commits once per tick', async () => {
-  const { createAction, useStoreSubscription } = createStore({
+  const { createAction, useDerivedState } = createStore({
     answer: 0
   })
 
@@ -71,7 +71,7 @@ test('should batch draft commits once per tick', async () => {
 
   let count = 0
   const { result } = renderHook(() => {
-    return useStoreSubscription((state) => {
+    return useDerivedState((state) => {
       count++
       return state.answer
     })
@@ -94,7 +94,7 @@ test('should work with async actions', async () => {
       rating?: number
     }>
   }
-  const { createAction, useStoreSubscription } = createStore<State>({
+  const { createAction, useDerivedState } = createStore<State>({
     books: [
       {
         title: 'children of time',
@@ -120,9 +120,7 @@ test('should work with async actions', async () => {
     state.books[1].rating = rating2
   })
 
-  const { result } = renderHook(() =>
-    useStoreSubscription((state) => state.books)
-  )
+  const { result } = renderHook(() => useDerivedState((state) => state.books))
 
   await act(() => addBook())
 
@@ -149,7 +147,7 @@ test('should correctly handle when the hook deps change', async () => {
   }
 
   window.Map = MapMock
-  const { useStoreSubscription } = createStore({ value: 0 })
+  const { useDerivedState } = createStore({ value: 0 })
   window.Map = OriginalMap
 
   let count = 0
@@ -157,7 +155,7 @@ test('should correctly handle when the hook deps change', async () => {
     const [foo, setFoo] = useState(0)
     const [baseValue, setBaseValue] = useState(0)
 
-    useStoreSubscription(
+    useDerivedState(
       (state) => {
         count++
         return state.value + baseValue

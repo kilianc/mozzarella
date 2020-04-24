@@ -4,7 +4,7 @@
     <code>mozzarella</code>
   </h1>
   <p>
-    A cheezy-simple <b><code>679 bytes</code></b> hook based <b><code>immutable store</code></b>, that leverages <b><code>useState</code></b> and <b><code>Immer</code></b> to create independent rendering trees, so that your components <b>only re-render when they should<b/>.
+    A cheezy-simple <b><code>679 bytes</code></b> hook based <b><code>immutable store</code></b>, that leverages <b><code>useState</code></b> and <b><code>Immer</code></b> to create independent rendering trees, so that your components <b>only re-render when they should</b>.
   </p>
   <br>
   <br>
@@ -12,19 +12,29 @@
   <br>
 </div>
 
-**mozzarella** 
+## Motivation
+
+I have been struggling to find a <b>state management</b> solution for `react`, that embraces <b>plain JavaScript</b> without forcing me to adopt an opinionated pattern, requires a lot of boilerplate code, well typed and that would make sense when looking at it two weeks later.
+
+### The main design goals for `mozzarella` where:
+
+* Be as simple as a mozzarella (duh!)
+* Use immutability without getting in the way
+* Use plain JS functions as actions
+* Use async or sync functions for actions
+* Prevent unnecessary re-rendering of components
+* Batch changes together to prevent race conditions
+* `TypeScript` support
+
+## Install
+
+    $ yarn add --dev --exact mozzarella
+
 ## Demos
 
 CodeSandbox demos
 
-## Install
-
-    $ yarn add --dev --exact selector
-
-## Usage
-
-
-`select` the part of your global state that your component needs and **only re-render when the selected state changes**.
+## Basic Example ([try it]())
 
 ```tsx
 import React from "react";
@@ -33,7 +43,7 @@ import { createStore } from "./mozzarella";
 
 // create a store and pass an initial state
 
-const { getState, createAction, useStoreSelector } = createStore({
+const { getState, createAction, useDerivedState } = createStore({
   names: ["kilian", "hassan", "juliet"],
   places: ["san francisco", "salò", "lebanon"]
 });
@@ -52,7 +62,7 @@ const addPlace = createAction((state, name: string) => {
 
 const Names = () => {
   console.info("<Names /> re-render");
-  const names = useStoreSelector(state => state.names);
+  const names = useDerivedState(state => state.names);
 
   return (
     <div>
@@ -73,20 +83,14 @@ const Names = () => {
 ReactDOM.render(<Names />, document.getElementById("root"));
 ```
 
-## How it works
-
-This library allows you to use a *"subscribe through selectors"* approach, to connect your components to the store.
-
-The implementation is very simple ([60LOC](src/create-store.ts)) and all it does is run all the selectors used by your components and determine when to call `setState` to trigger a re-render.
-
-## Example with pure functional components
+## Example with pure functional components ([try it]())
 
 ```tsx
 // store.ts
 
 import { createStore } from 'react-create-store'
 
-export const { getState, createAction, useStoreSelector } = createStore({
+export const { getState, createAction, useDerivedState } = createStore({
   names: ['kilian', 'hassan', 'juliet'],
   places: ['san francisco', 'salò', 'lebanon']
 })
@@ -130,7 +134,7 @@ export const Fruits: FC<FruitsProps> = ({ fruits }) => (
 )
 
 export const ConnectedFruits = () => {
-  const props = useStoreSelector((state) => {
+  const props = useDerivedState((state) => {
     fruits: state.fruits,
     onAdd: actions.onAdd,
     onRemove: actions.popFruit
@@ -161,7 +165,7 @@ ReactDOM.render(<App />, document.getElementById('app'))
 ```ts
 createStore <S>(initialState: S) => {
   getState: () => S;
-  useStoreSelector: <R>(selector: (state: S) => R) => R;
+  useDerivedState: <R>(selector: (state: S) => R) => R;
   createAction: <U extends unknown[]>(actionFn: (state: Draft<S>, ...params: U) => void) => (...params: U) => void;
 }
 ```
@@ -170,7 +174,7 @@ Takes the initial state as parameter and returns an object with three properties
 
 * [`getState`](#getState)
 * [`createAction`](#createAction)
-* [`useStoreSelector`](#useStoreSelector)
+* [`useDerivedState`](#useDerivedState)
 
 ### `getState`
 
@@ -186,12 +190,12 @@ Returns the instance of your immutable state
 const createAction = <U extends unknown[]>(actionFn: (state: Draft<S>, ...params: U) => void): (...params: U) => void;
 ```
 
-Takes a **pure function** as input and returns a *closured* **action** function that can manipulate a `Draft<S>` of your state. All changes will be committed on the next tick and all the selectors run to determine what needs to be re-rendered.
+Takes a **pure function** as input and returns a *closured* **action** function that can manipulate a `Draft<S>` of your state.
 
-### `useStoreSelector`
+### `useDerivedState`
 
 ```ts
-const useStoreSelector: <R>(selector: (state: S) => R) => R;
+const useDerivedState: <R>(selector: (state: S) => R) => R;
 ```
 
 Hook that given a selector function, will return the output of the selector and re-render the component only when it changes.

@@ -42,7 +42,7 @@ export const createStore = <S>(initialState: S) => {
     })
   }
 
-  const useStoreSubscription = <R>(
+  const useDerivedState = <R>(
     selector: (state: S) => R,
     dependencies: DependencyList = []
   ) => {
@@ -92,8 +92,7 @@ export const createStore = <S>(initialState: S) => {
 
   return {
     getState,
-    useStoreSubscription,
-    useDerivedState: useStoreSubscription,
+    useDerivedState,
     createAction
   }
 }
