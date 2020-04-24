@@ -6,8 +6,11 @@
   <p>
     <b>A <code>679 bytes</code> hook based <code>immutable store</code>, with <code>actions</code> and <code>subscriptions</code></b>
   </p>
+  <br>
+  <br>
+  <br>
+  <br>
 </div>
-
 
 **mozzarella** leverages `useState` and `Immer` to create independent rendering trees, so that your components only re-render when their dependencies change.
 
