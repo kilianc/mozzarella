@@ -62,7 +62,7 @@ Last but not least: *your state management should be easy to understand for some
 ```tsx
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { createStore } from './mozzarella'
+import { createStore } from 'mozzarella'
 
 // create a store and pass an initial state
 
@@ -111,7 +111,7 @@ ReactDOM.render(<Names />, document.getElementById('root'))
 ```tsx
 // store.ts
 
-import { createStore } from 'react-create-store'
+import { createStore } from 'mozzarella'
 
 export const { getState, createAction, useDerivedState } = createStore({
   names: ['kilian', 'arianna', 'antonia', 'pasquale'],
