@@ -51,7 +51,7 @@ Last but not least: *your state management should be easy to understand for some
 
 ## Install
 
-    $ yarn add --dev --exact mozzarella immer
+    $ yarn add --dev --exact mozzarella immer react-fast-compare
 
 ## Demos 👩‍💻
 
