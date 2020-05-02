@@ -4,7 +4,7 @@
   <br>
   <br>
   <p>
-    A cheezy-simple <b><code>679 bytes</code></b> hook based <b><code>immutable store</code></b>, that leverages <b><code>useState</code></b> and <b><code>Immer</code></b> to create independent rendering trees, so that your components <b>only re-render when they should</b>.
+    A cheezy-simple <b><code>679 bytes</code></b> hook based <b><code>immutable store</code></b>, that leverages <b><code>useState</code></b> and <b><code>Immer</code></b> to create independent rendering trees so that your components <b>only re-render when they should</b>.
   </p>
   <div align="center">
 
@@ -22,7 +22,7 @@
 
 I have been struggling to find a **state management** solution for `react` that makes you interact with your state using plain functions as a baseline. Most of the alternatives I found compromise simplicity, they're verbose or super abstract. I wanted an option that didn't force me to adopt a specific data pattern and was lean.
 
-I don't like boilerplate code. It's the main reason why I stopped using `redux`, but I never stopped chasing most of its design goals. I love how in `redux`, components can be **built in isolation**, **tested easily** and its overall **separation of concerns**.
+I don't like boilerplate code. It's the main reason why I stopped using `redux`, but I never stopped chasing most of its design goals. I love how in `redux`, components can be **built in isolation**, **tested easily**, and its overall **separation of concerns**.
 
 While using some of the available `redux` alternatives, I kept asking myself:
 
@@ -31,7 +31,7 @@ While using some of the available `redux` alternatives, I kept asking myself:
 
 This led to many awkward implementations attempts, that ultimately fell short one way or another.
 
-I also love **TypeScript**, and it has been hard to find a well balanced solution that satisfied all my requirements as well as having a strong type support.
+I also love **TypeScript**, and it has been hard to find a well balanced solution that satisfied all my requirements as well as having strong type support.
 
 Last but not least: *your state management should be easy to understand for someone that didn't participate in the project design choices*.
 
