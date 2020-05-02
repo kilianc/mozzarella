@@ -46,7 +46,8 @@
   },
   "peerDependencies": {
     "immer": ">6.0.0",
-    "react": ">16.8.0"
+    "react": ">16.8.0",
+    "react-fast-compare": ">3"
   },
   "scripts": {
     "lint": "tsc --noEmit && eslint 'src/**/*.ts' --max-warnings=0",
