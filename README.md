@@ -57,7 +57,7 @@ Last but not least: *your state management should be easy to understand for some
 
 > Coming soon
 
-## Basic Example ([try it]())
+## Basic Example ([try it](https://codesandbox.io/s/mozzarella-basic-8og5b?file=/src/index.tsx))
 
 ```tsx
 import React from 'react'
@@ -106,7 +106,7 @@ const Names = () => {
 ReactDOM.render(<Names />, document.getElementById('root'))
 ```
 
-## Example with pure functional components ([try it]())
+## Example with pure functional components ([try it](https://codesandbox.io/s/mozzarella-fc-kwcvh?file=/src/index.tsx))
 
 ```tsx
 // store.ts
