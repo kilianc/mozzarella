@@ -114,8 +114,7 @@ ReactDOM.render(<Names />, document.getElementById('root'))
 import { createStore } from 'mozzarella'
 
 export const { getState, createAction, useDerivedState } = createStore({
-  names: ['kilian', 'arianna', 'antonia', 'pasquale'],
-  places: ['san francisco', 'gavardo', 'salò']
+  fruits: []
 })
 ```
 
@@ -136,8 +135,9 @@ export const popFruit = createAction((state) => {
 ```tsx
 // fruits.tsx
 
-import { FC } from 'react'
-import { actions } from './actions'
+import React, { FC } from 'react'
+import * as actions from './actions'
+import { useDerivedState } from './store'
 
 type FruitsProps = {
   fruits: string[]
@@ -146,11 +146,13 @@ type FruitsProps = {
 }
 
 // use this in your component stories and docs
-export const Fruits: FC<FruitsProps> = ({ fruits }) => (
+export const Fruits = ({ fruits, onRemove, onAdd }: FruitsProps) => (
   <div>
     <h2>Fruits:</h2>
     <ul>
-      {names.map((name, key) => <li key={key}>{name}</li>)}
+      {fruits.map((fruit, key) => (
+        <li key={key}>{fruit}</li>
+      ))}
     </ul>
     <button onClick={onRemove}>remove last fruit</button>
     <button onClick={() => onAdd('bananas')}>add bananas</button>
@@ -158,15 +160,15 @@ export const Fruits: FC<FruitsProps> = ({ fruits }) => (
 )
 
 // use this in your app rendering tree
-Fruits.Connected = () => {
-  const derivedProps = useDerivedState((state) => {
+Fruits.Connected = (() => {
+  const derivedProps = useDerivedState((state) => ({
     fruits: state.fruits,
-    onAdd: actions.onAdd,
+    onAdd: actions.addFruit,
     onRemove: actions.popFruit
-  })
+  }))
 
   return <Fruits {...derivedProps} />
-}
+}) as FC
 ```
 
 ```tsx
