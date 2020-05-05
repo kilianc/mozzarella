@@ -46,6 +46,7 @@ export const createStore = <S>(initialState: S) => {
     selector: (state: S) => R,
     dependencies: DependencyList = []
   ) => {
+    // eslint-disable-next-line
     const memoizedSelector = useCallback(selector, dependencies)
     const memoizedSelectorRef = useRef(memoizedSelector)
 
