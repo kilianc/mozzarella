@@ -94,6 +94,7 @@ test('should work with async actions', async () => {
       rating?: number
     }>
   }
+
   const { createAction, useDerivedState } = createStore<State>({
     books: [
       {
