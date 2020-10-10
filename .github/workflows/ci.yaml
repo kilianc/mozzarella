@@ -27,7 +27,7 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
       - name: Only 14
-        if: github.ref == 'master' && matrix.node-version == '14'
+        if: matrix.node-version == '14'
         run: echo 14
       - name: Dump matrix context
         env:
