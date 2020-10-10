@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x, 14.x]
+        node-version: ['12', '14']
     steps:
       - uses: actions/checkout@v1
       - name: Use Node.js ${{ matrix.node-version }}
@@ -13,11 +13,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: "https://registry.npmjs.org"
-      - name: install
+      - name: Install
         run: yarn --frozen-lockfile
-      - name: lint
+      - name: Lint
         run: yarn lint
-      - name: test
+      - name: Test
         run: yarn test
-      - name: build
+      - name: Build
         run: yarn build
+      - name: NPM Publish
+        uses: JS-DevTools/npm-publish@v1
+        if: github.ref == 'master' && matrix.node-version == '14'
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
