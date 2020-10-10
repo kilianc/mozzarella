@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x, 14.x]
+        node-version: [12, 14]
     steps:
       - uses: actions/checkout@v1
       - name: Use Node.js ${{ matrix.node-version }}
@@ -21,3 +21,11 @@ jobs:
         run: yarn test
       - name: build
         run: yarn build
+      - uses: JS-DevTools/npm-publish@v1
+        if: github.ref == 'master' && matrix.node-version == '14'
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: echo "$MATRIX_CONTEXT"

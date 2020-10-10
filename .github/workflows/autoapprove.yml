@@ -1,11 +1,7 @@
-name: Autoapprove
-
-on:
-  pull_request:
-
+name: autoapprove
+on: [pull_request]
 jobs:
   autoapprove:
-    name: Autoapprove dependabot PRs
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/auto-approve-action@v2.0.0
