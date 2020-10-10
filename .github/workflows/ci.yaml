@@ -13,18 +13,22 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: "https://registry.npmjs.org"
-      - name: install
+      - name: Install
         run: yarn --frozen-lockfile
-      - name: lint
+      - name: Lint
         run: yarn lint
-      - name: test
+      - name: Test
         run: yarn test
-      - name: build
+      - name: Build
         run: yarn build
-      - uses: JS-DevTools/npm-publish@v1
+      - name: NPM Publish
+        uses: JS-DevTools/npm-publish@v1
         if: github.ref == 'master' && matrix.node-version == '14'
         with:
           token: ${{ secrets.NPM_TOKEN }}
+      - name: Only 14
+        if: github.ref == 'master' && matrix.node-version == '14'
+        run: echo 14
       - name: Dump matrix context
         env:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
