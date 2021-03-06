@@ -53,10 +53,6 @@ Last but not least: *your state management should be easy to understand for some
 
     $ yarn add --dev --exact mozzarella immer react-fast-compare
 
-## Demos 👩‍💻
-
-> Coming soon
-
 ## Basic Example ([try it](https://codesandbox.io/s/mozzarella-basic-8og5b?file=/src/index.tsx))
 
 ```tsx
