@@ -23,6 +23,6 @@ jobs:
         run: yarn build
       - name: NPM Publish
         uses: JS-DevTools/npm-publish@v1
-        if: github.ref == 'master' && matrix.node-version == '14'
+        if: github.ref == 'refs/heads/master' && matrix.node-version == '14'
         with:
           token: ${{ secrets.NPM_TOKEN }}
