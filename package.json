@@ -38,9 +38,9 @@
     "immer": "9.0.1",
     "jest": "25.5.4",
     "prettier": "2.2.1",
-    "react": "17.0.1",
+    "react": "17.0.2",
     "react-fast-compare": "3.2.0",
-    "react-test-renderer": "17.0.1",
+    "react-test-renderer": "17.0.2",
     "ts-jest": "25.5.1",
     "typescript": "3.9.9"
   },
