@@ -24,7 +24,7 @@
   "types": "lib/esm/create-store.d.ts",
   "devDependencies": {
     "@testing-library/react": "11.2.7",
-    "@testing-library/react-hooks": "7.0.0",
+    "@testing-library/react-hooks": "7.0.1",
     "@types/jest": "26.0.23",
     "@types/react": "17.0.9",
     "@typescript-eslint/eslint-plugin": "2.34.0",
