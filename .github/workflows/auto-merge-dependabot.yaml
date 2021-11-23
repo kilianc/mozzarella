@@ -1,0 +1,14 @@
+name: auto-merge-dependabot
+on: [pull_request_target]
+env:
+  PR_URL: ${{ github.event.pull_request.html_url }}
+  github-token: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  auto-merge-dependabot:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' || github.actor == 'kilianc'
+    steps:
+      - name: auto-merge
+        run: gh pr merge --auto --squash "$PR_URL"
+      - name: auto-approve
+        run: gh pr review --approve "$PR_URL"
