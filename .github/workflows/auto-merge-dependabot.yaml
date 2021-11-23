@@ -2,7 +2,7 @@ name: auto-merge-dependabot
 on: [pull_request_target]
 env:
   PR_URL: ${{ github.event.pull_request.html_url }}
-  github-token: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   auto-merge-dependabot:
     runs-on: ubuntu-latest
