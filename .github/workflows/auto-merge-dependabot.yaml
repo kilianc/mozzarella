@@ -6,7 +6,11 @@ env:
 jobs:
   auto-merge-dependabot:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' || github.actor == 'kilianc'
+    # Only dependabot. A PR auto-merged here is merged with GITHUB_TOKEN, and
+    # GitHub does not start workflow runs for pushes made with that token — so
+    # anything merged this way never runs `ci` on master, and never reaches the
+    # publish step. That silently swallowed the 2.0.0 release.
+    if: github.actor == 'dependabot[bot]'
     steps:
       - name: auto-merge
         run: gh pr merge --auto --squash "$PR_URL"
