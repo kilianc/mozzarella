@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# Run a command from the project's pinned toolchain image (see tools/Dockerfile).
+#
+#   bin/tools yarn --frozen-lockfile
+#   bin/tools yarn test
+#
+# Only the project directory is mounted, and the container runs as the invoking
+# host user so files it writes are not owned by root.
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+image="mozzarella-tools"
+
+if [[ -z "$(docker images -q "$image" 2>/dev/null)" ]]; then
+  docker build -t "$image" "$root/tools"
+fi
+
+exec docker run --rm -i \
+  -u "$(id -u):$(id -g)" \
+  -v "$root:/work" \
+  -w /work \
+  "$image" "$@"

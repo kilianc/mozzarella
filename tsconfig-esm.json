@@ -1,6 +1,8 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": [
-    "src/**/*.test.ts"
-  ]
+  "compilerOptions": {
+    "outDir": "./lib/esm",
+    "types": []
+  },
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }

@@ -1,29 +1,26 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "./",
     "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
+    "jsx": "react-jsx",
     "lib": ["dom", "ESNext"],
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "outDir": "./lib/esm",
+    "rootDir": "./src",
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "ESNext"
+    "target": "ES2020",
+    "types": ["jest"]
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    ".git",
-    "node_modules"
-  ]
+  "include": ["src"],
+  "exclude": [".git", "node_modules"]
 }
