@@ -1,6 +1,6 @@
 {
   "name": "mozzarella",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A cheezy-simple hook based immutable store for React",
   "keywords": [
     "hooks",
@@ -80,8 +80,8 @@
     "format": "prettier --write .",
     "build:esm": "tsc -p tsconfig-esm.json && node scripts/write-module-type.mjs esm",
     "build:cjs": "tsc -p tsconfig-cjs.json && node scripts/write-module-type.mjs cjs",
-    "build": "rm -rf lib && yarn build:esm && yarn build:cjs",
+    "build": "rm -rf lib && npm run build:esm && npm run build:cjs",
     "test": "jest",
-    "bench": "yarn build && node bench/index.mjs"
+    "bench": "npm run build && node bench/index.mjs"
   }
 }

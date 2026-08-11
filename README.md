@@ -4,7 +4,7 @@
   <br>
   <br>
   <p>
-    A cheezy-simple <b><code>1.3 kB</code></b> hook based <b><code>immutable store</code></b>, that leverages <b><code>useState</code></b> and <b><code>Immer</code></b> to create independent rendering trees so that your components <b>only re-render when they should</b>.
+    A cheezy-simple <b><code>1.5 kB</code></b> hook based <b><code>immutable store</code></b>, that leverages <b><code>useState</code></b> and <b><code>Immer</code></b> to create independent rendering trees so that your components <b>only re-render when they should</b>.
   </p>
   <div align="center">
 
@@ -51,7 +51,7 @@ Last but not least: *your state management should be easy to understand for some
 
 ## Install
 
-    $ yarn add --exact mozzarella immer react-fast-compare
+    $ npm install --save-exact mozzarella immer react-fast-compare
 
 `immer`, `react` and `react-fast-compare` are peer dependencies — `mozzarella` uses whatever versions your app already has.
 
@@ -277,7 +277,7 @@ export default [
 ### `createStore`
 
 ```ts
-createStore <S extends object>(initialState: S) => {
+createStore <S extends object>(initialState: S, options?: StoreOptions) => {
   getState: () => S
   useDerivedState: <R>(selector: (state: S) => R, dependencies?: DependencyList) => R
   createAction: <U extends unknown[]>(actionFn: (state: Draft<S>, ...params: U) => void, options?: ActionOptions) => Action<U>
@@ -305,6 +305,25 @@ const { getState, createAction, useDerivedState } = createStore<State>({
   photos: {},
   albums: {}
 })
+```
+
+#### `options.freeze`
+
+```ts
+type StoreOptions = {
+  freeze?: boolean // default: process.env.NODE_ENV !== 'production'
+}
+```
+
+Whether committed state is deep-frozen, so that mutating it outside an action throws instead of silently desynchronising the store. Without it, a stray `getState().items.push(…)` mutates in place: no commit runs, the selector returns the *same* reference, and no subscriber is ever notified — the UI goes stale with no error.
+
+Immer walks every container it copied to freeze it, so the guard costs a pass over the whole container on every commit — at 2000 entries that is the difference between `2 µs` and `152 µs` per update. It is therefore **on outside production**, where catching the bug is worth far more than the throughput, and **off in production**, where it isn't.
+
+The store keeps a private Immer instance, so this never changes how `produce` behaves elsewhere in your app.
+
+```ts
+// keep the guard in production too
+const store = createStore(initialState, { freeze: true })
 ```
 
 ---
@@ -518,59 +537,69 @@ Returns the `AbortSignal` tied to the run that received `state`. It aborts when 
 
 ## Performance
 
-Numbers below are produced by `yarn bench`, which measures the **published build** in `lib/` — not the TypeScript sources. `zustand` and `redux` appear as reference points; they make different trade-offs, so read the tables as "what does this design cost", not as a scoreboard.
+Numbers below are produced by `npm run bench`, which measures the **published build** in `lib/` — not the TypeScript sources. `zustand` and `redux` appear as reference points; they make different trade-offs, so read the tables as "what does this design cost", not as a scoreboard.
 
 #### Dispatch cost (no subscribers)
 
 | store                              | ops/sec    | mean   | ± rme |
 | ---------------------------------- | ---------- | ------ | ----- |
-| mozzarella — action + immer commit | 1,553,045  | 731 ns | 1.2%  |
-| zustand — setState                 | 22,304,278 | 49 ns  | 2.0%  |
-| redux — dispatch                   | 20,084,805 | 71 ns  | 3.3%  |
+| mozzarella — action + immer commit | 2,338,473  | 471 ns | 1.2%  |
+| zustand — setState                 | 22,241,651 | 49 ns  | 1.7%  |
+| redux — dispatch                   | 21,609,555 | 67 ns  | 2.7%  |
 
-One update, applied and settled. `mozzarella` pays for an Immer draft commit and a microtask hop; the other two mutate a plain object synchronously. This is the price of immutability plus batching, and it's paid once per tick rather than once per action — see the next table.
+One update, applied and settled. mozzarella pays for an Immer draft commit and a microtask hop; the other two mutate a plain object synchronously. Different guarantees — read it as the price of immutability, not as a ranking.
 
 #### Batching 100 updates fired in a single tick
 
 | store                                | batches/sec | mean     | per update | subscriber recomputations |
 | ------------------------------------ | ----------- | -------- | ---------- | ------------------------- |
-| mozzarella — 100 actions in one tick | 43,268      | 29.38 µs | 294 ns     | 1                         |
-| zustand — 100 setState in one tick   | 400,504     | 2.94 µs  | 29 ns      | 100                       |
+| mozzarella — 100 actions in one tick | 92,501      | 11.34 µs | 113 ns     | 1                         |
+| zustand — 100 setState in one tick   | 390,971     | 2.83 µs  | 28 ns      | 100                       |
 
-Batching is where the design pays for itself: a hundred actions produce **one** draft commit and **one** selector recomputation per subscriber, so derived work doesn't scale with how chatty your actions are.
+mozzarella collapses every mutation made in the same tick into one draft commit, so subscribers recompute once no matter how many actions ran. Amortised over a batch, an action costs a fraction of a lone awaited dispatch.
 
 #### Fan-out: one scoped update across 200 subscribed components
 
-| store                                            | ops/sec | mean      | components re-rendered |
-| ------------------------------------------------ | ------- | --------- | ---------------------- |
-| mozzarella — 1 update, 200 subscribed components | 10,532  | 102.60 µs | 1 of 200               |
-| zustand — 1 update, 200 subscribed components    | 12,365  | 88.35 µs  | 1 of 200               |
+| store                                            | ops/sec | mean     | components re-rendered |
+| ------------------------------------------------ | ------- | -------- | ---------------------- |
+| mozzarella — 1 update, 200 subscribed components | 11,651  | 93.94 µs | 1 of 200               |
+| zustand — 1 update, 200 subscribed components    | 12,359  | 87.08 µs | 1 of 200               |
 
-The claim on the tin: with 200 components subscribed to 200 different slices, changing one slice re-renders exactly one component. Wall-clock includes React committing the update inside `act()`, which both stores pay equally.
+Only the component whose slice changed should re-render. Wall-clock includes React committing the update inside `act()`, which both stores pay equally.
+
+#### One update as the state grows
+
+| state size   | mozzarella | freeze: true | by hand | freeze tax |
+| ------------ | ---------- | ------------ | ------- | ---------- |
+| 10 entries   | 1.22 µs    | 2.35 µs      | 226 ns  | 2×         |
+| 200 entries  | 1.35 µs    | 15.86 µs     | 234 ns  | 12×        |
+| 2000 entries | 2.02 µs    | 155.78 µs    | 942 ns  | 77×        |
+
+Incrementing a counter on one entry of a keyed record, leaving every other entry untouched. `by hand` is the same edit written as a reducer would write it — spread the container, spread the one entry, share the rest — which is what `zustand` and `redux` cost for this shape. mozzarella stays flat as the state grows because Immer copies only the path it touched. Freezing is what does not: Immer deep-freezes every container it copied, so the guard costs a walk over the whole container on every commit. It is on while `NODE_ENV !== "production"`, where catching an accidental mutation outside an action is worth more than the throughput, and off in production. Override it either way with `createStore(state, { freeze })`. Each cell is measured in its own process, because a 2000-entry state churns enough garbage that sharing one would measure the collector instead.
 
 #### Bundle size
 
 | imported           | minified | minified + gzipped |
 | ------------------ | -------- | ------------------ |
-| everything         | 3176 B   | 1480 B             |
-| `createStore` only | 2802 B   | 1321 B             |
+| everything         | 3534 B   | 1704 B             |
+| `createStore` only | 3153 B   | 1545 B             |
 
 Peer dependencies excluded, bundled and minified with esbuild. The package is side-effect free, so an app that never touches `useIsRunning` doesn't ship it.
 
-_Measured on Node 22.23.2 · React 19.2.8 · 18 cores · Linux arm64. Reproduce with `yarn bench`._
+_Measured on Node 22.23.2 · React 19.2.8 · 18 cores · Linux arm64. Reproduce with `npm run bench`._
 
 ## How to contribute
 
 Contributions and bug fixes from the community are welcome. You can run the test suite locally with:
 
-    $ yarn lint
-    $ yarn test
-    $ yarn bench
+    $ npm run lint
+    $ npm test
+    $ npm run bench
 
 If you'd rather not install a Node toolchain on your machine, the repo ships a pinned one in `tools/Dockerfile`. Prefix any command with `bin/tools` to run it inside that image:
 
-    $ bin/tools yarn install
-    $ bin/tools yarn test
+    $ bin/tools npm ci
+    $ bin/tools npm test
 
 ## License
 

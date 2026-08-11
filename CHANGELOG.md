@@ -1,6 +1,37 @@
 # Changelog
 
+## 2.1.0
+
+Substantially faster commits, and one new option to go with them.
+
+### Added
+
+* **`createStore(state, { freeze })`** — whether committed state is deep-frozen
+  so that mutating it outside an action throws. Immer walks every container it
+  copied to do this, which made a commit scale with the size of the state rather
+  than the size of the change. It now defaults to **on outside production** and
+  **off in production**: the guard catches real bugs while you write the code,
+  and the throughput matters once you ship. Each store keeps a private Immer
+  instance, so this never changes how `produce` behaves elsewhere in your app.
+
+### Changed
+
+* **Performance.** A single dispatch went from `808 ns` to `471 ns`, and an
+  action batched with others from `277 ns` to `113 ns`. One update against a
+  2000-entry state went from `152 µs` to `2.3 µs`, and no longer scales with the
+  size of the state. Drafts are now created on first touch, the shared scheduler
+  allocates nothing for the common single-store flush, `default`-mode runs are
+  counted rather than allocated, and a synchronous action settles without an
+  extra promise hop.
+* **npm is the only package manager.** `yarn.lock` is replaced by
+  `package-lock.json`, the scripts, CI and `tools/Dockerfile` all use `npm`, and
+  `.npmrc` sets `save-exact` so dependencies stay pinned the way they already
+  were. Contributors run `npm ci`, `npm test`, `npm run bench`.
+
 ## 2.0.0
+
+_Tagged in the repository but never published to npm — everything below ships in
+2.1.0, which is the first release after `1.0.7`._
 
 The remaining design goals from the README are done, and the toolchain is on
 current majors across the board.

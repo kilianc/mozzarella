@@ -1,8 +1,9 @@
-// Benchmarks for mozzarella. Run with `yarn bench` (builds first).
+// Benchmarks for mozzarella. Run with `npm run bench` (builds first).
 //
 // Everything here measures the *published* build in `lib/esm`, never the
 // TypeScript sources, so the numbers reflect what a consumer actually installs.
 import os from 'node:os'
+import { execFile } from 'node:child_process'
 import { gzipSync } from 'node:zlib'
 
 import { Bench } from 'tinybench'
@@ -25,6 +26,12 @@ const SLICES = 200
 const BATCH = 100
 const BENCH_OPTIONS = { time: 300, warmupTime: 100 }
 
+// The benchmark runs under `NODE_ENV=test` (React strips `act` from its
+// production build), so every store is created with the options mozzarella
+// would pick for itself in production. What freezing costs is measured
+// separately, in `benchStateSize`.
+const PROD = { freeze: false }
+
 const sections = []
 
 const section = (title, note, headers, rows) => {
@@ -36,7 +43,7 @@ const section = (title, note, headers, rows) => {
 // ---------------------------------------------------------------------------
 
 const benchDispatch = async () => {
-  const mozzarella = createStore({ count: 0 })
+  const mozzarella = createStore({ count: 0 }, PROD)
   const bump = mozzarella.createAction((state) => {
     state.count++
   })
@@ -80,7 +87,7 @@ const benchDispatch = async () => {
 
 const benchBatching = async () => {
   let mozzarellaSelectorRuns = 0
-  const mozzarella = createStore({ count: 0 })
+  const mozzarella = createStore({ count: 0 }, PROD)
   const bump = mozzarella.createAction((state) => {
     state.count++
   })
@@ -107,7 +114,7 @@ const benchBatching = async () => {
   // Count how often a subscriber's selector is asked to recompute for a batch
   // of BATCH updates. This is the number that decides how much derived work an
   // app repeats, independently of how fast a single dispatch is.
-  const countingStore = createStore({ count: 0 })
+  const countingStore = createStore({ count: 0 }, PROD)
   const countingBump = countingStore.createAction((state) => {
     state.count++
   })
@@ -180,9 +187,10 @@ const benchBatching = async () => {
 // ---------------------------------------------------------------------------
 
 const renderMozzarellaTree = async () => {
-  const store = createStore({
-    slices: Array.from({ length: SLICES }, () => 0)
-  })
+  const store = createStore(
+    { slices: Array.from({ length: SLICES }, () => 0) },
+    PROD
+  )
 
   const touch = store.createAction((state, index) => {
     state.slices[index]++
@@ -326,7 +334,58 @@ const benchFanOut = async () => {
 }
 
 // ---------------------------------------------------------------------------
-// 4. Bundle size — mozzarella's own code, peers excluded.
+// 4. Scaling — does one small update get more expensive as the state grows?
+// ---------------------------------------------------------------------------
+
+const SIZES = [10, 200, 2000]
+const VARIANTS = ['mozzarella', 'frozen', 'spread']
+
+const runner = new URL('./state-size-runner.mjs', import.meta.url).pathname
+
+const measureStateSize = (size, variant) =>
+  new Promise((resolve, reject) => {
+    const child = execFile(
+      process.execPath,
+      [runner],
+      { env: { ...process.env, SIZE: String(size), VARIANT: variant } },
+      (error, stdout) => {
+        if (error) return reject(error)
+        resolve(JSON.parse(stdout).ms)
+      }
+    )
+
+    child.stderr.pipe(process.stderr)
+  })
+
+const benchStateSize = async () => {
+  const rows = []
+
+  for (const size of SIZES) {
+    // Sequentially, so the runs don't compete for cores.
+    const results = {}
+    for (const variant of VARIANTS) {
+      results[variant] = await measureStateSize(size, variant)
+    }
+
+    rows.push([
+      `${size} entries`,
+      formatMs(results.mozzarella),
+      formatMs(results.frozen),
+      formatMs(results.spread),
+      `${(results.frozen / results.mozzarella).toFixed(0)}\u00d7`
+    ])
+  }
+
+  section(
+    'One update as the state grows',
+    'Incrementing a counter on one entry of a keyed record, leaving every other entry untouched. `by hand` is the same edit written as a reducer would write it — spread the container, spread the one entry, share the rest — which is what `zustand` and `redux` cost for this shape. mozzarella stays flat as the state grows because Immer copies only the path it touched. Freezing is what does not: Immer deep-freezes every container it copied, so the guard costs a walk over the whole container on every commit. It is on while `NODE_ENV !== "production"`, where catching an accidental mutation outside an action is worth more than the throughput, and off in production. Override it either way with `createStore(state, { freeze })`. Each cell is measured in its own process, because a 2000-entry state churns enough garbage that sharing one would measure the collector instead.',
+    ['state size', 'mozzarella', 'freeze: true', 'by hand', 'freeze tax'],
+    rows
+  )
+}
+
+// ---------------------------------------------------------------------------
+// 5. Bundle size — mozzarella's own code, peers excluded.
 // ---------------------------------------------------------------------------
 
 const measure = async (contents) => {
@@ -375,6 +434,7 @@ const main = async () => {
   await benchDispatch()
   await benchBatching()
   await benchFanOut()
+  await benchStateSize()
   await benchSize()
 
   const cpu = os.cpus()[0].model.trim()
@@ -395,7 +455,7 @@ const main = async () => {
       note,
       ''
     ]),
-    `_Measured on ${environment}. Reproduce with \`yarn bench\`._`
+    `_Measured on ${environment}. Reproduce with \`npm run bench\`._`
   ].join('\n')
 
   console.log(output)

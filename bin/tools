@@ -2,8 +2,8 @@
 #
 # Run a command from the project's pinned toolchain image (see tools/Dockerfile).
 #
-#   bin/tools yarn --frozen-lockfile
-#   bin/tools yarn test
+#   bin/tools npm ci
+#   bin/tools npm test
 #
 # Only the project directory is mounted, and the container runs as the invoking
 # host user so files it writes are not owned by root.
