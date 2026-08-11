@@ -5,7 +5,12 @@
 #
 #   docker build -t mozzarella-tools tools/
 #
-# and run it via the `bin/tools` wrapper (or `make lint` / `make test` / ...).
+# and run it via the `bin/tools` wrapper:
+#
+#   bin/tools npm ci
+#   bin/tools npm test
+#
+# npm is the only package manager this project uses.
 FROM node:22.23.2-bookworm-slim
 
 RUN apt-get update \
@@ -17,7 +22,6 @@ RUN apt-get update \
 ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
     NPM_CONFIG_FUND=false \
     NPM_CONFIG_CACHE=/tmp/npm-cache \
-    YARN_CACHE_FOLDER=/tmp/yarn-cache \
     HOME=/tmp
 
 WORKDIR /work

@@ -9,7 +9,12 @@
  */
 export type Commit = () => () => void
 
-const pendingCommits = new Set<Commit>()
+// Almost every flush belongs to a single store. That case is held in a plain
+// variable and never touches the set, so the common path allocates nothing:
+// no set entry, no intermediate arrays, no iterator.
+let firstCommit: Commit | null = null
+const extraCommits = new Set<Commit>()
+
 let flushPromise: Promise<void> | null = null
 
 const flush = () => {
@@ -17,15 +22,28 @@ const flush = () => {
   // next flush instead of being swallowed by this one.
   flushPromise = null
 
-  const commits = Array.from(pendingCommits)
-  pendingCommits.clear()
+  const commit = firstCommit
+  firstCommit = null
 
-  const notifications = commits.map((commit) => commit())
+  if (commit === null) return
+
+  if (extraCommits.size === 0) {
+    // One store: applying and notifying back to back *is* the two-phase order.
+    commit()()
+    return
+  }
+
+  const commits = [commit, ...extraCommits]
+  extraCommits.clear()
+
+  const notifications = commits.map((pending) => pending())
   notifications.forEach((notify) => notify())
 }
 
 export const scheduleCommit = (commit: Commit) => {
-  pendingCommits.add(commit)
+  if (firstCommit === null) firstCommit = commit
+  else if (firstCommit !== commit) extraCommits.add(commit)
+
   flushPromise = flushPromise || Promise.resolve().then(flush)
 
   return flushPromise

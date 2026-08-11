@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { render, renderHook, act, screen } from '@testing-library/react'
+import { produce } from 'immer'
 
 import { createStore } from './create-store.js'
 import { getSignal } from './concurrency.js'
@@ -25,6 +26,8 @@ const deferred = (): Deferred => {
 
 /** Lets every already queued microtask run. */
 const flush = () => act(async () => undefined)
+
+const noop = () => undefined
 
 test('should correctly create a store', () => {
   const store = createStore({
@@ -303,6 +306,66 @@ test('should commit and release the store when an action throws', async () => {
   expect(getState().value).toBe(1)
 })
 
+describe('freezing', () => {
+  test('`freeze: true` freezes what a commit produces', async () => {
+    const { getState, createAction } = createStore(
+      { items: [{ value: 0 }] },
+      { freeze: true }
+    )
+
+    const bump = createAction((state) => {
+      state.items[0].value++
+    })
+
+    await bump()
+
+    const state = getState()
+
+    expect(Object.isFrozen(state.items)).toBe(true)
+    expect(Object.isFrozen(state.items[0])).toBe(true)
+    expect(() => {
+      state.items[0].value = 99
+    }).toThrow()
+  })
+
+  test('`freeze: false` leaves committed state unfrozen but still correct', async () => {
+    const { getState, createAction } = createStore(
+      { items: [{ value: 0 }] },
+      { freeze: false }
+    )
+
+    const bump = createAction((state) => {
+      state.items[0].value++
+    })
+
+    const before = getState()
+
+    await bump()
+    await bump()
+
+    const after = getState()
+
+    expect(after.items[0].value).toBe(2)
+    expect(Object.isFrozen(after.items)).toBe(false)
+    // Not freezing must not cost the structural sharing the store relies on to
+    // decide what changed.
+    expect(after).not.toBe(before)
+    expect(before.items[0].value).toBe(0)
+  })
+
+  test('a store never changes how the app`s own immer behaves', async () => {
+    const { createAction } = createStore({ value: 0 }, { freeze: false })
+
+    await createAction((state) => {
+      state.value++
+    })()
+
+    // The store holds a private Immer instance, so opting out of freezing must
+    // not reach the global one every app already shares.
+    expect(Object.isFrozen(produce({ nested: {} }, noop).nested)).toBe(true)
+  })
+})
+
 describe('concurrency', () => {
   test('`drop` ignores calls made while the action is running', async () => {
     const { getState, createAction } = createStore({ count: 0 })
@@ -481,6 +544,43 @@ describe('concurrency', () => {
     await Promise.all([first, second])
 
     expect(getState().value).toBe(0)
+  })
+
+  test('`cancelAll` releases the slots of a running default action', async () => {
+    const { getState, createAction } = createStore({ value: 0 })
+
+    const gate = deferred()
+
+    const run = createAction(async (state) => {
+      await gate.promise
+      state.value++
+    })
+
+    const first = run()
+    const second = run()
+
+    expect(run.runningCount).toBe(2)
+
+    run.cancelAll()
+
+    expect(run.isRunning).toBe(false)
+    expect(run.runningCount).toBe(0)
+
+    gate.resolve()
+    await Promise.all([first, second])
+
+    // Both runs settle after `cancelAll` already released their slots, which
+    // must not push the count below zero.
+    expect(run.runningCount).toBe(0)
+
+    // A default action holds nothing that could stop it, so `cancelAll` frees
+    // the slot but the writes still land — unlike a cancellable mode.
+    expect(getState().value).toBe(2)
+
+    await run()
+
+    expect(run.runningCount).toBe(0)
+    expect(getState().value).toBe(3)
   })
 
   test('actions without a concurrency mode get a signal that never aborts', async () => {

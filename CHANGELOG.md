@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+* **npm is the only package manager.** `yarn.lock` is replaced by
+  `package-lock.json`, the scripts, CI and `tools/Dockerfile` all use `npm`, and
+  `.npmrc` sets `save-exact` so dependencies stay pinned the way they already
+  were. Contributors run `npm ci`, `npm test`, `npm run bench`.
+
 ## 2.0.0
 
 The remaining design goals from the README are done, and the toolchain is on
