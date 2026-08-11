@@ -2,10 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2017",
-    "outDir": "./lib/cjs"
+    "outDir": "./lib/cjs",
+    "types": []
   },
-  "exclude": [
-    "src/**/*.test.ts"
-  ]
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
 }

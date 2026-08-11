@@ -5,14 +5,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['12', '14', '16']
+        node-version: ['20', '22', '24']
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          registry-url: "https://registry.npmjs.org"
+          cache: yarn
+          registry-url: 'https://registry.npmjs.org'
       - name: Install
         run: yarn --frozen-lockfile
       - name: Lint
@@ -21,8 +22,10 @@ jobs:
         run: yarn test
       - name: Build
         run: yarn build
+      - name: Benchmark
+        run: yarn bench
       - name: NPM Publish
-        uses: JS-DevTools/npm-publish@v1
-        if: github.ref == 'refs/heads/master' && matrix.node-version == '14'
+        uses: JS-DevTools/npm-publish@v3
+        if: github.ref == 'refs/heads/master' && matrix.node-version == '22'
         with:
           token: ${{ secrets.NPM_TOKEN }}
