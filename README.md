@@ -596,6 +596,8 @@ Contributions and bug fixes from the community are welcome. You can run the test
     $ npm test
     $ npm run bench
 
+`npm run bench` renders into `jsdom` and needs **Node 22.19 or newer**; the library itself supports Node 18 and up.
+
 If you'd rather not install a Node toolchain on your machine, the repo ships a pinned one in `tools/Dockerfile`. Prefix any command with `bin/tools` to run it inside that image:
 
     $ bin/tools npm ci

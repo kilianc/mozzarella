@@ -23,6 +23,11 @@ jobs:
       - name: Build
         run: npm run build
       - name: Benchmark
+        # The benchmark renders into jsdom, which pulls in undici and needs
+        # Node >= 22.19. That is a constraint on this repo's tooling, not on
+        # the library — undici never ships to consumers, and lint, test and
+        # build still run against every version in the matrix.
+        if: matrix.node-version == '22'
         run: npm run bench
       - name: NPM Publish
         uses: JS-DevTools/npm-publish@v3
