@@ -55,7 +55,7 @@
     "eslint-plugin-prettier": "5.5.6",
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "17.11.0",
-    "immer": "11.1.16",
+    "immer": "11.1.18",
     "jest": "30.4.2",
     "jest-environment-jsdom": "30.5.0",
     "jsdom": "30.0.1",
