@@ -68,7 +68,7 @@
     "ts-jest": "29.4.12",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "typescript-eslint": "8.67.0",
-    "zustand": "5.0.14"
+    "zustand": "5.0.15"
   },
   "peerDependencies": {
     "immer": ">=6.0.0",
