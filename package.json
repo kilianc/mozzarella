@@ -65,7 +65,7 @@
     "react-fast-compare": "3.2.2",
     "redux": "5.0.1",
     "tinybench": "6.2.0",
-    "ts-jest": "29.4.12",
+    "ts-jest": "29.4.14",
     "typescript": "npm:@typescript/typescript6@6.0.2",
     "typescript-eslint": "8.68.0",
     "zustand": "5.0.15"
