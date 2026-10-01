@@ -57,7 +57,7 @@
     "globals": "17.12.0",
     "immer": "11.1.18",
     "jest": "30.5.0",
-    "jest-environment-jsdom": "30.5.0",
+    "jest-environment-jsdom": "30.5.2",
     "jsdom": "30.0.1",
     "prettier": "3.9.6",
     "react": "19.2.8",
