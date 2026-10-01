@@ -58,7 +58,7 @@
     "immer": "11.1.18",
     "jest": "30.5.0",
     "jest-environment-jsdom": "30.5.2",
-    "jsdom": "30.0.1",
+    "jsdom": "30.1.1",
     "prettier": "3.9.9",
     "react": "19.3.0",
     "react-dom": "19.3.0",
